@@ -2,10 +2,10 @@ import {
   assertArrayIncludes,
   assertEquals,
 } from "https://deno.land/std@0.165.0/testing/asserts.ts";
-import { Cache, entry, EvictedFunc } from "../lru/lru.ts";
+import { entry, EvictedFunc, Lru } from "../lru/lru.ts";
 
 Deno.test("test lru get", () => {
-  const lru = new Cache(1, null);
+  const lru = new Lru(1, null);
   lru.Set("k1", 22);
   const v1 = lru.Get("k1");
   assertEquals(v1, 22);
@@ -14,7 +14,7 @@ Deno.test("test lru get", () => {
 });
 
 Deno.test("test lru removeOld", () => {
-  const lru = new Cache<number>(2, null);
+  const lru = new Lru<number>(2, null);
   lru.Set("k1", 11);
   lru.Set("k2", 22);
   lru.Set("k3", 33);
@@ -29,7 +29,7 @@ Deno.test("callback func", () => {
   const cb: EvictedFunc<number> = (key: string, v: number) => {
     res.push([key, v]);
   };
-  const lru = new Cache<number>(2, cb);
+  const lru = new Lru<number>(2, cb);
   lru.Set("k1", 11);
   lru.Set("k2", 22);
   lru.Set("k3", 33);

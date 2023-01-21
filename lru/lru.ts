@@ -11,7 +11,7 @@ export type EvictedFunc<T> = (key: string, value: T) => void;
  */
 export type entry<T> = [key: string, value: T];
 
-export class Cache<T> {
+export class Lru<T> {
   /**
    * maxNums is The maximum memory allowed
    */
@@ -37,8 +37,8 @@ export class Cache<T> {
    */
   cache: Map<string, T>;
 
-  constructor(maxBytes: number, onEvicted: EvictedFunc<T> | null) {
-    this.maxNums = maxBytes;
+  constructor(maxNums: number, onEvicted: EvictedFunc<T> | null) {
+    this.maxNums = maxNums;
     this.dl = new DoublyLinkedList<entry<T>>();
     this.onEvicted = onEvicted;
     this.usedNums = 0;
