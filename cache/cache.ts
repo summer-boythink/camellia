@@ -1,10 +1,20 @@
-// deno-lint-ignore-file no-explicit-any
 import { Lru } from "../lru/lru.ts";
 
-export class Cache {
-  lru: Lru<any>;
+/**
+ * export 'Lru' for `camellia` service
+ */
+export class Cache<T> {
+  lru: Lru<T>;
 
   constructor(maxNums: number) {
     this.lru = new Lru(maxNums, null);
+  }
+
+  add(key: string, val: T) {
+    this.lru.Set(key, val);
+  }
+
+  get(key: string): T | undefined {
+    return this.lru.Get(key);
   }
 }
