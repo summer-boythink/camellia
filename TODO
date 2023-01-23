@@ -1,0 +1,2 @@
+1. Add concurrent logic to the `cache.ts`
+2. better test for `test/http.test.ts`
