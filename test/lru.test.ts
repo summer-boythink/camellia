@@ -1,7 +1,4 @@
-import {
-  assertArrayIncludes,
-  assertEquals,
-} from "https://deno.land/std@0.165.0/testing/asserts.ts";
+import { assertArrayIncludes, assertEquals } from "../deps.ts";
 import { entry, EvictedFunc, Lru } from "../lru/lru.ts";
 
 Deno.test("test lru get", () => {

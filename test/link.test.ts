@@ -1,5 +1,5 @@
 import DoubleLink from "../links/doubleLink.ts";
-import { assertEquals } from "https://deno.land/std@0.165.0/testing/asserts.ts";
+import { assertEquals } from "../deps.ts";
 
 Deno.test("test DoubleLink", () => {
   const dl = new DoubleLink<number>();
