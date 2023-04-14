@@ -13,7 +13,7 @@ export const DEFAULT_REPLICAS = 50;
 /**
  * http server that provides semellia cache
  */
-export class HttpPool implements PeerPicker {
+export class HttpPool<T> implements PeerPicker<T> {
   listenOptions: Deno.TcpListenOptions;
 
   // Its own url is used to distinguish it from peers
@@ -23,7 +23,7 @@ export class HttpPool implements PeerPicker {
   peers: HashRing | undefined;
 
   // client for `HTTPPool`
-  httpGetters: Map<string, HttpGet> | undefined;
+  httpGetters: Map<string, HttpGet<T>> | undefined;
 
   // basePath of camelllia
   basePath: string;
@@ -42,14 +42,14 @@ export class HttpPool implements PeerPicker {
     this.peers.Add(...peers);
     this.httpGetters = new Map();
     for (const peer of peers) {
-      this.httpGetters.set(peer, new HttpGet(peer + this.basePath));
+      this.httpGetters.set(peer, new HttpGet(peer + "/" + this.basePath));
     }
   }
 
   /**
    * PickPeer picks a peer according to key
    */
-  PickPeer(key: string): PeerGetter | undefined {
+  PickPeer(key: string): PeerGetter<T> | undefined {
     const peer = this.peers?.Get(key);
     if (peer !== undefined && peer !== this.selfUrl) {
       console.log(`Pick peer ${peer}`);
@@ -92,7 +92,7 @@ export class HttpPool implements PeerPicker {
           continue;
         }
 
-        const data = group!.Get(key);
+        const data = await group!.Get(key);
         ResponseJson(requestEvent, {
           data: data,
           status: 200,

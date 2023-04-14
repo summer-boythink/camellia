@@ -1,7 +1,7 @@
 import { assertEquals } from "../deps.ts";
 import { GetGroup, Group } from "../main.ts";
 
-Deno.test("test Get", () => {
+Deno.test("test Get", async () => {
   const db = new Map([
     ["Tom", "630"],
     ["Jack", "555"],
@@ -21,11 +21,11 @@ Deno.test("test Get", () => {
   }, 20);
 
   for (let i = 0; i < 2; i++) {
-    db.forEach((v, k) => {
-      assertEquals(camellia.Get(k), v);
+    db.forEach(async (v, k) => {
+      assertEquals(await camellia.Get(k), v);
     });
   }
   assertEquals(count, 3);
-  assertEquals(camellia.Get("unknown"), "nono");
+  assertEquals(await camellia.Get("unknown"), "nono");
   assertEquals(GetGroup("first"), camellia);
 });

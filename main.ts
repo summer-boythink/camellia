@@ -22,7 +22,7 @@ export class Group<T> {
   // Used to store data
   cacheStore: Cache<T>;
   // Distributed nodes
-  peers: PeerPicker | undefined;
+  peers: PeerPicker<T> | undefined;
 
   constructor(name: string, getter: Getter<T>, maxNums?: number) {
     this.name = name;
@@ -38,7 +38,7 @@ export class Group<T> {
   /**
    * RegisterPeers registers a PeerPicker for choosing remote peer
    */
-  RegisterPeers(peers: PeerPicker) {
+  RegisterPeers(peers: PeerPicker<T>) {
     if (this.peers !== undefined) {
       throw Error("RegisterPeerPicker called more than once");
     }
@@ -50,29 +50,33 @@ export class Group<T> {
    * get the value from the `cacheStore`,
    * otherwise call the `getter` to get the new value
    */
-  Get(key: string): T {
+  async Get(key: string): Promise<T> {
     if (key.length === 0) throw new Error("param key is required");
     const val = this.cacheStore.get(key);
     if (val !== undefined) {
       console.log("Camellia Cache hit!");
       return val;
     }
-    return this.load(key);
+    return await this.load(key);
   }
 
-  private load(key: string): T {
+  private async load(key: string): Promise<T> {
     if (this.peers !== undefined) {
-      if (this.peers.PickPeer(key) !== undefined) {
-        // if(this.)
+      const peer = this.peers.PickPeer(key);
+      if (peer !== undefined) {
+        return await this.getFromPeer(peer, key);
       }
     }
 
     return this.getLocally(key);
   }
 
-  // private getFromPeer(peer:PeerGetter,key:string):T{
-  //   // return peer.Get(this.name,key)
-  // }
+  /**
+   * Get value from peer
+   */
+  private async getFromPeer(peer: PeerGetter<T>, key: string): Promise<T> {
+    return await peer.Get(this.name, key);
+  }
 
   /**
    * call the `getter` to get the new value

@@ -1,8 +1,7 @@
-export interface PeerPicker {
-  PickPeer(key: string): PeerGetter | undefined;
+export interface PeerPicker<T> {
+  PickPeer(key: string): PeerGetter<T> | undefined;
 }
 
-export interface PeerGetter {
-  // deno-lint-ignore no-explicit-any
-  Get(group: string, key: string): Promise<any>;
+export interface PeerGetter<T> {
+  Get(group: string, key: string): Promise<T>;
 }
