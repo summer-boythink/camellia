@@ -1,5 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Cache } from "./cache/cache.ts";
+import { PeerGetter, PeerPicker } from "./nodes/peer.ts";
 
 // TODO:better type
 // When the data doesn't exist,`Getter` will be callback
@@ -20,6 +21,8 @@ export class Group<T> {
   maxNums?: number;
   // Used to store data
   cacheStore: Cache<T>;
+  // Distributed nodes
+  peers: PeerPicker | undefined;
 
   constructor(name: string, getter: Getter<T>, maxNums?: number) {
     this.name = name;
@@ -33,13 +36,21 @@ export class Group<T> {
   }
 
   /**
+   * RegisterPeers registers a PeerPicker for choosing remote peer
+   */
+  RegisterPeers(peers: PeerPicker) {
+    if (this.peers !== undefined) {
+      throw Error("RegisterPeerPicker called more than once");
+    }
+    this.peers = peers;
+  }
+
+  /**
    * If the key exists in the `cacheStore`,
    * get the value from the `cacheStore`,
    * otherwise call the `getter` to get the new value
-   * @param key
-   * @returns
    */
-  public Get(key: string): T {
+  Get(key: string): T {
     if (key.length === 0) throw new Error("param key is required");
     const val = this.cacheStore.get(key);
     if (val !== undefined) {
@@ -50,13 +61,21 @@ export class Group<T> {
   }
 
   private load(key: string): T {
+    if (this.peers !== undefined) {
+      if (this.peers.PickPeer(key) !== undefined) {
+        // if(this.)
+      }
+    }
+
     return this.getLocally(key);
   }
 
+  // private getFromPeer(peer:PeerGetter,key:string):T{
+  //   // return peer.Get(this.name,key)
+  // }
+
   /**
    * call the `getter` to get the new value
-   * @param key
-   * @returns
    */
   private getLocally(key: string): T {
     const locallyData = this.getter(key);
